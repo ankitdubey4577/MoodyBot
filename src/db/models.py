@@ -1,10 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from datetime import datetime
 from .database import Base
-# add to src/db/models.py
-from sqlalchemy import Column, Integer, String,Float, DateTime
-from datetime import datetime
-from .database import Base
+
 
 class Event(Base):
     __tablename__ = "events"
@@ -25,6 +22,9 @@ class Task(Base):
     effective_priority = Column(String)
     scheduled_time = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+    status = Column(String, default="planned")
+    deadline = Column(String, nullable=True)
+    ai_priority_reason = Column(String, nullable=True)
 
 class MoodHistory(Base):
     __tablename__ = "mood_history"
@@ -55,7 +55,3 @@ class UserStats(Base):
     last_active_date = Column(String)  # YYYY-MM-DD
     xp = Column(Integer, default=0)
     level = Column(Integer, default=1)
-
-deadline = Column(String, nullable=True)
-ai_priority = Column(String, nullable=True)
-ai_priority_reason = Column(String, nullable=True)

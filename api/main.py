@@ -18,31 +18,29 @@ from src.agents.analytics_agent import mood_productivity
 from src.agents.sentiment_agent import analyze_sentiment
 from src.utils.date_parser import parse_natural_datetime
 
-# ------------------------------
+
 # Optional LLM
-# ------------------------------
+
 try:
     from langchain_community.llms import Ollama
 except Exception:
     Ollama = None
 
-# ==============================
+
 # App
-# ==============================
+
 app = FastAPI(title="MoodyBot Enterprise API")
 graph = MoodyBotGraph()
 
 _llm = Ollama(model="llama3", temperature=0.25, num_predict=320) if Ollama else None
 
-# ==============================
+
 # DB
-# ==============================
+
 def db():
     return SessionLocal()
 
-# ==============================
 # LLM JSON helper (SAFE)
-# ==============================
 def llm_ask_json(prompt: str, retries: int = 2) -> Optional[Dict[str, Any]]:
     if _llm is None:
         return None
@@ -72,9 +70,7 @@ def llm_ask_json(prompt: str, retries: int = 2) -> Optional[Dict[str, Any]]:
 
     return None
 
-# ==============================
 # Schemas
-# ==============================
 class ChatIn(BaseModel):
     text: str
     default_mode: str = "work"
@@ -111,9 +107,9 @@ class FeedbackIn(BaseModel):
     time_taken: Optional[int] = None
     time_of_day: Optional[str] = None
 
-# ==============================
+
 # Intent detection (ADD_TASK vs CHAT vs SCHEDULE)
-# ==============================
+
 _INTENT_ADD = re.compile(r"\b(add|create)\b.*\b(task|todo)\b", re.I)
 _INTENT_SCHED = re.compile(
     r"\b(i have to|i need to|remind me|call|meet|meeting|appointment|schedule)\b",
@@ -130,9 +126,9 @@ def detect_intent(text: str) -> str:
         return "SCHEDULE"
     return "CHAT"
 
-# ==============================
+
 # CLEAN task extraction + splitting
-# ==============================
+
 _ACTION_VERBS = {
     "call","meet","email","message","prepare","prep","review","send",
     "finish","complete","submit","write","plan","check","fix","update",
@@ -213,11 +209,11 @@ def confidence_for_title(title: str) -> float:
 
     return max(0.0, min(score, 0.95))
 
-# ==============================
+
 # Scheduling helpers
 # - Event duration = duration_min (encoded in event title)
 # - Avoid naps near meetings
-# ==============================
+
 _DUR_TAG = re.compile(r"\((\d+)\s*m\)", re.I)
 
 _MEETING_HINTS = {"meeting","call","sync","standup","interview","demo","appointment","review"}
@@ -407,10 +403,10 @@ def staggered_slots(
             slots.append(slot)
     return slots[:5]
 
-# ==============================
+
 # Task <-> Event linkage (no DB schema change)
 # - Encode duration in Event.title
-# ==============================
+
 def event_title_for_task(task_id: int, task_title: str, duration_min: int) -> str:
     # format: Task#123 (15m): Do thing
     safe_title = (task_title or "").strip()
@@ -421,9 +417,9 @@ def event_title_for_task(task_id: int, task_title: str, duration_min: int) -> st
 def find_event_for_task(d, task_id: int) -> Optional[Event]:
     return d.query(Event).filter(Event.title.like(f"Task#{task_id} %")).first()
 
-# ==============================
+
 # DB helpers
-# ==============================
+
 def task_to_dict(t: Task) -> Dict[str, Any]:
     return {
         "id": t.id,
@@ -525,9 +521,9 @@ def sync_task_event_on_update(d, task_obj: Task, duration_min: int = 30) -> List
 
     return ops
 
-# ==============================
+
 # Learning loop: Mood -> task success optimization
-# ==============================
+
 def best_task_titles_for_mood(mood: str, limit: int = 3) -> List[str]:
     d = db()
     try:
@@ -586,18 +582,18 @@ def reprioritize(task: Task, sent: dict):
         if hasattr(task, "ai_priority_reason"):
             task.ai_priority_reason = None
 
-# ==============================
+
 # Core Endpoints
-# ==============================
+
 @app.post("/analyze")
 async def analyze(payload: Dict[str, Any]):
     # keep existing behavior (graph expects payload["input"] typically)
     text = payload.get("input") or payload.get("text") or ""
     return await graph.run(text)
 
-# ==============================
+
 # Tasks
-# ==============================
+
 @app.get("/tasks")
 def list_tasks(mode: Optional[str] = None):
     d = db()
@@ -665,9 +661,9 @@ def delete_task(task_id: int):
     finally:
         d.close()
 
-# ==============================
+
 # Schedule
-# ==============================
+
 @app.get("/schedule")
 def list_events():
     d = db()
@@ -704,9 +700,9 @@ def delete_event(event_id: int):
     finally:
         d.close()
 
-# ==============================
+
 # Gamification (required by Streamlit)
-# ==============================
+
 @app.get("/gamification")
 def gamification():
     d = db()
@@ -722,9 +718,9 @@ def gamification():
     finally:
         d.close()
 
-# ==============================
+
 # Feedback (required for Complete button + XP)
-# ==============================
+
 @app.post("/feedback")
 def feedback(data: FeedbackIn):
     d = db()
@@ -774,9 +770,9 @@ def feedback(data: FeedbackIn):
     finally:
         d.close()
 
-# ==============================
+
 # Analytics endpoints (required by UI)
-# ==============================
+
 @app.get("/analytics/mood")
 def analytics_mood():
     return mood_productivity()
@@ -798,9 +794,9 @@ def weekly_mood_success():
     finally:
         d.close()
 
-# ==============================
+
 # Dashboard
-# ==============================
+
 @app.get("/dashboard")
 def dashboard():
     d = db()
