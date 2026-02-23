@@ -8,7 +8,7 @@ import os
 import time
 import requests
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pandas as pd
 
 # -----------------------------
@@ -794,7 +794,7 @@ def page_ai_assistant():
     if st.button("Send", key="ai_send", type="primary"):
         out = send_chat_and_update(text, mode=mode, auto_add=auto_add, auto_schedule=auto_schedule)
         st.session_state[chat_key].append({
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "user_text": text,
             "assistant_text": out.get("reply",""),
             "raw": out,

@@ -3,9 +3,19 @@ from src.utils.llm import OllamaClient
 from src.models.schemas import MoodAnalysis, AgentStep
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 llm = OllamaClient()
+
+class MoodAnalyzer:
+    """Wrapper class for mood analysis functionality"""
+
+    def __init__(self):
+        self.name = "MoodAnalyzer"
+
+    def analyze(self, text: str) -> dict:
+        """Analyze mood from text"""
+        return analyze_mood(text)
 
 @tool
 def analyze_mood(text: str) -> dict:
@@ -44,11 +54,11 @@ def analyze_mood(text: str) -> dict:
         )
 
     return {
-        "mood": mood.dict(),
+        "mood": mood.model_dump(),
         "agent_step": AgentStep(
             agent="MoodAnalyzer",
             action="Classify emotional blockers",
             output=f"{mood.label} ({mood.confidence:.2f})",
-            timestamp=datetime.utcnow().isoformat()
-        ).dict()
+            timestamp=datetime.now(timezone.utc).isoformat()
+        ).model_dump()
     }

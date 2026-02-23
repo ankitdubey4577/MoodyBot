@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 def reprioritize(task, sentiment):
     score = 0
@@ -8,11 +8,11 @@ def reprioritize(task, sentiment):
     if task.deadline:
         try:
             dl = datetime.fromisoformat(task.deadline)
-            hours_left = (dl - datetime.utcnow()).total_seconds() / 3600
+            hours_left = (dl - datetime.now(timezone.utc)).total_seconds() / 3600
             if hours_left < 24:
                 score += 3
                 reason.append("deadline soon")
-        except:
+        except (ValueError, AttributeError, TypeError):
             pass
 
     # Mood-based adjustment

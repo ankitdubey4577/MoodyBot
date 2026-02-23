@@ -15,5 +15,5 @@ def detect_mood(text: str) -> dict:
     """
     try:
         return json.loads(llm.ask(prompt))
-    except:
+    except (json.JSONDecodeError, ValueError, AttributeError, Exception):
         return {"mood": "neutral", "confidence": 0.6}

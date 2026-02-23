@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 # Try to use dateparser if available
@@ -38,7 +38,8 @@ def parse_natural_datetime(text: str) -> Optional[str]:
         return None
 
     text = text.strip()
-    now = datetime.now()
+    # Use timezone-aware datetime for consistency
+    now = datetime.now(timezone.utc).replace(tzinfo=None)  # Remove timezone for backward compatibility
 
     # -----------------------------
     # 1️⃣ Preferred: dateparser

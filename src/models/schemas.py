@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 # -----------------------------
 # Core Analysis Models
@@ -34,7 +34,7 @@ class AgentStep(BaseModel):
             agent=agent,
             action=action,
             output=output,
-            timestamp=datetime.utcnow().isoformat()
+            timestamp=datetime.now(timezone.utc).isoformat()
         )
 
 # -----------------------------

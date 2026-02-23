@@ -1,10 +1,16 @@
+from typing import Dict, Any
+
 class MoodScheduler:
     """
     Deterministic fallback scheduler for MoodyBot.
     Used when LLM scheduling is disabled or fails.
     """
 
-    def schedule_task(self, task_name: str, mood: dict) -> dict:
+    def schedule_task(self, task_name: str, mood: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Schedule a task based on mood analysis.
+        Returns scheduling recommendation with time slot, tactic, and success probability.
+        """
         mood_label = mood.get("label", "stuck")
 
         slots = {

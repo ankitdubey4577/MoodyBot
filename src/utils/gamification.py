@@ -27,8 +27,11 @@ def calculate_xp(task_priority: str, completed: bool, mood_boost: bool) -> int:
     return xp
 
 def get_level(xp: int) -> int:
+    """Calculate user level based on XP thresholds."""
     level = 1
     for i, threshold in enumerate(LEVEL_XP_THRESHOLDS):
         if xp >= threshold:
             level = i + 1
+        else:
+            break  # Early exit when threshold not met
     return level

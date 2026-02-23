@@ -19,6 +19,13 @@ class MoodyBotGraph:
         return g.compile()
 
     def analyze(self, state):
+        """
+        Analyze user input and determine mode, mood, and tasks.
+        """
+        # Validate input exists
+        if "input" not in state:
+            raise ValueError("State must contain 'input' key")
+
         text = state["input"]
 
         mode = detect_mode(text)

@@ -1,4 +1,10 @@
-def boost_priority(mood: str, user_priority: str) -> tuple:
+from typing import Tuple, Optional
+
+def boost_priority(mood: str, user_priority: str) -> Tuple[str, Optional[str]]:
+    """
+    Boost task priority based on mood analysis.
+    Returns (priority, reason) tuple where reason may be None.
+    """
     if mood in ["tired", "anxious"] and user_priority == "low":
         return "high", "Boosted due to low-energy compatible task"
     return user_priority, None

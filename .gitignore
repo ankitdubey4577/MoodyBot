@@ -24,6 +24,29 @@ Thumbs.db
 
 # SQLite / local DB
 *.db
+*.db.test
 
 # Node (if any)
 node_modules/
+
+# Claude Code
+.claude/
+
+# Test files
+test_*.py
+test_*.json
+input.json
+output.json
+
+# Temporary files
+COMMIT_MESSAGE.txt
+*.tmp
+
+# ML Models (trained models can be large)
+*.pkl
+*.joblib
+*.h5
+*.pt
+
+# Performance test scripts
+performance_test.sh
